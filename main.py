@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import psycopg2
 
 app = FastAPI()
 
@@ -10,10 +11,27 @@ app.add_middleware(
     allow_headers = ['*']
 )
 
-@app.get('/')
-def get_root():
-    return {'Chords': ['F', 'G', 'E', 'A', 'D', 'G', 'C']}
+conn = psycopg2.connect(
+    dbname = 'chordapp',
+    user = 'finn',
+    host = 'localhost',
+    port = '5432'
+)
 
 @app.get('/chords')
 def get_chords(song_name: str):
-    return {'Chords': ['D', 'G', 'C', 'C']}
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT chords
+        FROM songs
+        WHERE title = %s
+        """,
+        (song_name,)
+    )
+
+    result = cur.fetchone()
+
+    if result is None:
+        return {'error': "song not found"}
+    return result[0]
