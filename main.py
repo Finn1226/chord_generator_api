@@ -18,6 +18,21 @@ conn = psycopg2.connect(
     port = '5432'
 )
 
+@app.get('/songs')
+def get_all_chords():
+    cur = conn.cursor()
+    cur.execute("""
+                SELECT title, artist
+                FROM songs
+                """)
+
+    rows = cur.fetchall()
+
+    songs = [
+        {'title': row[0], 'artist': row[1]} for row in rows
+    ]
+    return songs
+
 @app.get('/chords')
 def get_chords(song_name: str):
     cur = conn.cursor()
