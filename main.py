@@ -27,11 +27,7 @@ def get_all_chords():
                 """)
 
     rows = cur.fetchall()
-
-    songs = [
-        {'title': row[0], 'artist': row[1]} for row in rows
-    ]
-    return songs
+    return [{'title': row[0], 'artist': row[1]} for row in rows]
 
 @app.get('/chords')
 def get_chords(song_name: str):
@@ -50,3 +46,4 @@ def get_chords(song_name: str):
     if result is None:
         return {'error': "song not found"}
     return result[0]
+
